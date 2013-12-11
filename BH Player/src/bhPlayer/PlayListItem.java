@@ -20,6 +20,8 @@ public class PlayListItem {
 	public PlayListItem(String name, String loc, long sec, boolean isFile){
 		
 	}
+	
+	
 	public String getName(){
 		return name;
 	}
@@ -30,6 +32,12 @@ public class PlayListItem {
 		return second;
 	}
 	public void setLocation(String l, boolean readInfo){
+		location = l;
+		if(readInfo){
+			if(location != null && !location.equals("")){
+				taginfo = getTagInfo(location);
+			}
+		}
 		
 	}
 	public TagInfo getTagInfo(){
