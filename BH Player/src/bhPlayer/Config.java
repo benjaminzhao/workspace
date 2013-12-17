@@ -1,5 +1,8 @@
 package bhPlayer;
 
+import java.io.File;
+import java.io.IOException;
+
 public class Config {
 
 	private static Config instance = null;
@@ -7,11 +10,11 @@ public class Config {
 	private ConfigFile config = null;
 	
 	
-	public Config(){
-		
+	public Config(){	
+			
 	}
 	
-	public synchronized Config getInstance(){
+	public synchronized static Config getInstance(){
 		if(instance == null)
 			instance = new Config();
 		return instance;
@@ -25,6 +28,8 @@ public class Config {
 		
 		
 	}
-	
+	public void save(){
+		
+	}
 	
 }

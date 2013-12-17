@@ -35,7 +35,11 @@ public class BHPlayerGUI extends JFrame{
 	private JList playList;
 	private DefaultListModel ListModel; 
 	
-	static BHPlayerIO bhplayerIO;	
+	static BHPlayerIO bhplayerIO;
+	
+	private Config config = null;
+	private String initConfig = "config.ini";
+	
 	
 	BHPlayerGUI(){
 		super();
@@ -236,16 +240,21 @@ public class BHPlayerGUI extends JFrame{
 	private void LoadPL(){
 		//playlist
 	}
-	
+	private void LoadConfig(){
+		config = Config.getInstance();
+		if(initConfig == null)
+			new throws errors()
+		config.load(initConfig);
+	}
 	public static void main(String args[]){
 		
 		final BHPlayerGUI BHPlayer = new BHPlayerGUI();
 		SwingUtilities.invokeLater(new Runnable(){
 			public void run(){
-				BHPlayer.LoadGUI();
 				BHPlayer.LoadParas();
+				BHPlayer.LoadConfig();
+				BHPlayer.LoadGUI();
 				BHPlayer.LoadPL();
-				
 			}
 		});
 		

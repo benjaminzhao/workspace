@@ -1,16 +1,18 @@
 package bhPlayer;
 
 import java.io.*;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.zip.CRC32;
 
 public class ConfigFile {
 
-	private File config_file = null;
+	private File config_file = null;//file name only, no path
 	private Hashtable<String, String> props = new Hashtable<String, String>(64);
+	
 	//constructor
 	public ConfigFile(String configfilename){
-		
+		config_file = new File(configfilename);
+		loadConfig();
 	}
 	//item operation
 	public String get(String name){
@@ -45,20 +47,47 @@ public class ConfigFile {
 			return false;
 		if(!config_file.exists())
 			return false;
+		
 		try{
-			load();
+			return load();
 		}catch(IOException e){
 			e.printStackTrace();
 			return false;
 		}
 	}
-	public boolean load(BufferReader buf) throws IOException{
+	public boolean load() throws IOException{
+		Scanner s = new Scanner(config_file);
+		while(s.hasNextLine()){
+			String[] line = s.nextLine().split("=");
+			String key = line[0];
+			String value = line[1];
+			this.props.put(key, value);
+		}
 		return true;
 	}
 	public boolean saveConfig(){
-		return true;
+		if(config_file == null)
+			return false;
+		if(!config_file.exists())
+			return false;
+
+		try{
+			return save();
+		}catch(IOException e){
+			e.printStackTrace();
+			return false;
+		}
 	}
 	public boolean save() throws IOException{
+		PrintWriter pw = new PrintWriter(config_file);
+		Enumeration names = this.props.keys();
+		
+		while(names.hasMoreElements()){
+			String name = names.nextElement().toString();
+			String value = this.props.get(name);
+			pw.println(name+"="+value);
+		}
+		pw.close();
 		return true;
 	}
 	//crc functions

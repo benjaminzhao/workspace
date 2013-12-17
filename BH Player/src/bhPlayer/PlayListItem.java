@@ -21,7 +21,7 @@ public class PlayListItem {
 		this.second = sec;
 		this.isFile = isFile;
 		this.location = loc;
-		
+		Config config = Config.getInstance();
 		if(){
 			getFileInfo(location, true);
 		}
