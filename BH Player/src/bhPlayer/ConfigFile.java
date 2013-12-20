@@ -15,6 +15,46 @@ public class ConfigFile {
 		loadConfig();
 	}
 	//item operation
+	public int getInt(String name){
+		try{
+			return Integer.parseInt((String)props.get(name));
+		}catch(Exception e){
+			//e.printStackTrace();
+		}
+		return -1;
+	}
+	public int getInt(String name, int default_value){
+		try{
+			return Integer.parseInt((String)props.get(name));
+		}catch(Exception e){
+			//e.printStackTrace();
+		}
+		return default_value;
+	}
+	public boolean getBoolean(String name){
+		Object value = props.get(name);
+		return value != null?value.equals("true"):false;
+	}
+	public boolean getBoolean(String name, boolean default_value){
+		Object value = props.get(name);
+		return value != null?value.equals("true"):default_value;
+	}
+	public double getDouble(String name){
+		try{
+			return new Double((String)props.get(name)).doubleValue();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return -1d;
+	}
+	public double getDouble(String name, double default_value){
+		try{
+			return new Double((String)props.get(name)).doubleValue();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return default_value;
+	}
 	public String get(String name){
 		return (String) props.get(name);
 	}
@@ -22,7 +62,6 @@ public class ConfigFile {
 		Object value = props.get(name);
 		return value != null?(String)value:default_value;
 	}
-	
 	public void add(String name, int value){
 		props.put(name, Integer.toString(value));
 	}
@@ -60,17 +99,19 @@ public class ConfigFile {
 		while(s.hasNextLine()){
 			String[] line = s.nextLine().split("=");
 			String key = line[0];
-			String value = line[1];
+			String value = (line.length>1) ? line[1] : "";
+			//String line = s.nextLine();
+			//int id = line.indexOf("=");
+			//String key = line.substring(0, id).trim();
+			//String value = line.substring(id+1).trim();
 			this.props.put(key, value);
 		}
+		s.close();
 		return true;
 	}
 	public boolean saveConfig(){
 		if(config_file == null)
 			return false;
-		if(!config_file.exists())
-			return false;
-
 		try{
 			return save();
 		}catch(IOException e){
@@ -79,8 +120,8 @@ public class ConfigFile {
 		}
 	}
 	public boolean save() throws IOException{
-		PrintWriter pw = new PrintWriter(config_file);
-		Enumeration names = this.props.keys();
+		PrintWriter pw = new PrintWriter(new FileWriter(config_file));
+		Enumeration <String> names = this.props.keys();
 		
 		while(names.hasMoreElements()){
 			String name = names.nextElement().toString();

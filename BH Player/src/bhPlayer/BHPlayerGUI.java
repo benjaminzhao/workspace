@@ -38,8 +38,11 @@ public class BHPlayerGUI extends JFrame{
 	static BHPlayerIO bhplayerIO;
 	
 	private Config config = null;
-	private String initConfig = "config.ini";
+	private String initConfig = null;
 	
+	private Playlist		playlist = null;
+	private PlaylistItem	curPlaylistItem = null;
+	private boolean			curIsFile = false;
 	
 	BHPlayerGUI(){
 		super();
@@ -132,6 +135,7 @@ public class BHPlayerGUI extends JFrame{
 					int ret = jFolderOpen.showOpenDialog(BHPlayerGUI.this);
 					if (ret == JFileChooser.APPROVE_OPTION){
 						File folder = new File(jFolderOpen.getSelectedFile().toString());
+						config.setLastDir(folder.toString());
 						File[] files = folder.listFiles( new FilenameFilter() {
 							public boolean accept(File dir, String name) {
 								return name.toLowerCase().endsWith(".mp3");
@@ -152,7 +156,7 @@ public class BHPlayerGUI extends JFrame{
 			jMenuExit.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent e){
-					System.exit(0);
+					close();
 				}
 			});
 			jMenuFile.add(jMenuExit);
@@ -226,6 +230,12 @@ public class BHPlayerGUI extends JFrame{
 		
 		//JStatusBar Statusbar = new JStatusBar();
 		//add(Statusbar);
+		WindowListener windowslistener = new WindowAdapter(){
+			public void windowsClosing(WindowEvent e){
+				close();
+			}
+		};
+		addWindowListener(windowslistener);
 		
 		setLocationRelativeTo(null);
 		setVisible(true);
@@ -235,15 +245,23 @@ public class BHPlayerGUI extends JFrame{
 		//parameter
 		isPlaying = false;
 		AutoRun = false;
+		initConfig = "config.ini";
 	}
 	
-	private void LoadPL(){
+	private void loadPlaylist(){
 		//playlist
+		String plfile = config.getPlaylistFilename();
+		PlaylistFactory plf = PlaylistFactory.getInstance();
+		playlist = plf.getPlaylist();
+		if(playList == null){
+			config.setPlaylistClassName("BasePlaylist");
+			playlist = plf.getPlaylist();
+		}
+		
+		
 	}
 	private void LoadConfig(){
 		config = Config.getInstance();
-		if(initConfig == null)
-			new throws errors()
 		config.load(initConfig);
 	}
 	public static void main(String args[]){
@@ -254,7 +272,7 @@ public class BHPlayerGUI extends JFrame{
 				BHPlayer.LoadParas();
 				BHPlayer.LoadConfig();
 				BHPlayer.LoadGUI();
-				BHPlayer.LoadPL();
+				BHPlayer.loadPlaylist();
 			}
 		});
 		
@@ -332,7 +350,11 @@ public class BHPlayerGUI extends JFrame{
 		//2.pause
 		//3.set player status
 	}
-	
+	public void close(){
+		config.save();
+		dispose();
+		System.exit(0);
+	}
 	
 //	private javax.swing.filechooser.FileFilter NewFileFilter(final String desc, final String[] allowed_extensions){
 //		return new javax.swing.filechooser.FileFilter(){
