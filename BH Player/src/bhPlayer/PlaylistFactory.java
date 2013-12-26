@@ -23,6 +23,7 @@ public class PlaylistFactory {
 		
 		if(_playlistInstance == null){
 			String classname = _config.getPlaylistClassName();
+			//System.out.println(classname);
 			boolean interfaceFound = false;
 			try{
 				Class a = Class.forName(classname);
@@ -30,7 +31,7 @@ public class PlaylistFactory {
 				while(superclass != null){
 					Class[] interfaces = superclass.getInterfaces();
 					for(int i = 0; i<interfaces.length; i++){
-						if(interfaces[i].getName().equalsIgnoreCase("playlist")){
+						if(interfaces[i].getName().equalsIgnoreCase("bhPlayer.playlist")){
 							interfaceFound = true;
 							break;
 						}
@@ -44,7 +45,7 @@ public class PlaylistFactory {
 				else{
 					Class[] argsClass = new Class[]{};
 					Constructor c = a.getConstructor(argsClass);
-					_playlistInstance = (Playlist)(c.newInstance(null))
+					_playlistInstance = (Playlist)(c.newInstance(null));
 				}
 			}catch(Exception e){
 				e.printStackTrace();

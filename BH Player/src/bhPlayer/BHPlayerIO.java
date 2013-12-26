@@ -116,8 +116,8 @@ public class BHPlayerIO {
 		//player.play();
 	}
 	
-	public int getPos(){
-		int millisec = player.getPosition();
-		return millisec;
-	}
+//	public int getPos(){
+//		int millisec = player.getPosition();
+//		return millisec;
+//	}
 }

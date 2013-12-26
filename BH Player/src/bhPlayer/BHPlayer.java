@@ -14,7 +14,7 @@ import javazoom.jl.player.*;
 
 
 
-public class BHPlayerGUI extends JFrame{
+public class BHPlayer extends JFrame implements Loader{
 
 	private boolean isStart;
 	private boolean isStop;
@@ -40,20 +40,69 @@ public class BHPlayerGUI extends JFrame{
 	private Config config = null;
 	private String initConfig = null;
 	
-	private Playlist		playlist = null;
-	private PlaylistItem	curPlaylistItem = null;
-	private boolean			curIsFile = false;
+	private String showPlaylist = null;
+	private String showDSP = null;
+	private String skinPath = null;
+	private String skinVersion = "1";
 	
-	BHPlayerGUI(){
+	private Playlist playlist = null;
+	private PlaylistItem curPlaylistItem = null;
+	private boolean curIsFile = false;
+	
+	private PlayerUI mp = null;
+	private JWindow eqWin = null;
+	private JWindow plWin = null;
+	
+	
+	BHPlayer(){
 		super();
 	}
 	
 	void LoadGUI(){
 		//MAIN GUI
-		//JFrame a = new JFrame("BH Player");
+		try{
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		if(showPlaylist != null){
+			if(showPlaylist.equalsIgnoreCase("true"))
+				config.setPlaylistEnable(true);
+			else
+				config.setPlaylistEnable(false);
+		}
+
 		setTitle("BH player");
-		//setSize(getMaximumSize());
-		setSize(500, 500);
+		setUndecorated(true);
+		
+		mp = new PlayerUI();
+		if(showDSP != null && showDSP.equalsIgnoreCase("false"))
+			mp.getSkin().setDSPEnabled(false);
+		
+		if(skinPath != null)
+			mp.getSkin().setPath(skinPath);
+		mp.getSkin().setSkinVersion(skinVersion);
+		mp.loadUI(this);
+		setContentPane(this);		
+		setSize(new Dimension(mp.getSkin().getMainWidth(),mp.getSkin().getMainHeight()));
+		
+		plWin = new JWindow(this);
+		plWin.setContentPane(this);
+		plWin.setSize(new Dimension(mp.getSkin().getMainWidth(),mp.getSkin().getMainHeight()));
+		plWin.setVisible(false);
+		
+		addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				close();
+			}
+		});
+		
+		//setKeyBoardShortcut();
+		//setLocation();
+		setVisible(true);
+		
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		setResizable(true);
@@ -114,7 +163,7 @@ public class BHPlayerGUI extends JFrame{
 							}
 						});
 					
-					int ret = jFileOpen.showOpenDialog(BHPlayerGUI.this);
+					int ret = jFileOpen.showOpenDialog(BHPlayer.this);
 					if (ret == JFileChooser.APPROVE_OPTION){
 						PlayFile.setText("add: " + jFileOpen.getSelectedFile().toString() );
 						ListModel.addElement(jFileOpen.getSelectedFile().toString());
@@ -132,7 +181,7 @@ public class BHPlayerGUI extends JFrame{
 					jFolderOpen.setCurrentDirectory(new java.io.File("."));
 					jFolderOpen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					//jFolderOpen.setAcceptAllFileFilterUsed(false);
-					int ret = jFolderOpen.showOpenDialog(BHPlayerGUI.this);
+					int ret = jFolderOpen.showOpenDialog(BHPlayer.this);
 					if (ret == JFileChooser.APPROVE_OPTION){
 						File folder = new File(jFolderOpen.getSelectedFile().toString());
 						config.setLastDir(folder.toString());
@@ -144,7 +193,8 @@ public class BHPlayerGUI extends JFrame{
 						int i = 0;
 						for(File f:files){
 							i++;
-							ListModel.addElement(f.toString());
+							//ListModel.addElement(f.toString());
+							loadPL(f.toString());
 						}
 						PlayFile.setText(i+" files added" );
 			        }
@@ -181,7 +231,7 @@ public class BHPlayerGUI extends JFrame{
 					author.setBounds(35, 30, 130, 40);
 					about.add(author);
 					
-					JLabel version = new JLabel("Ver 1.0");
+					JLabel version = new JLabel("Ver 0.1");
 					version.setBounds(35, 50, 130, 40);
 					about.add(version);
 					
@@ -247,18 +297,55 @@ public class BHPlayerGUI extends JFrame{
 		AutoRun = false;
 		initConfig = "config.ini";
 	}
-	
-	private void loadPlaylist(){
+	private boolean loadPL(String filename){
+		boolean load = false;
 		//playlist
-		String plfile = config.getPlaylistFilename();
 		PlaylistFactory plf = PlaylistFactory.getInstance();
 		playlist = plf.getPlaylist();
+		System.out.println("get PL");
+		
 		if(playList == null){
-			config.setPlaylistClassName("BasePlaylist");
+			config.setPlaylistClassName("bhPlayer.BasePlaylist");
 			playlist = plf.getPlaylist();
+			System.out.println("get default PL");
 		}
+			
+		if(playList != null)
+			System.out.println("success");
+		else
+			System.out.println("failed");
 		
+		if( (filename!=null) && (!filename.equals("")) ){
+			if(filename.toLowerCase().endsWith(".m3u") || filename.toLowerCase().endsWith(".pls")){
+				//load playlist format file
+				load = playlist.load(filename);
+				if(load == false)
+					System.out.println("failed");
+				else
+					System.out.println("success");
+			}
+			else{//load song files
+				String songfile = null;
+				int i = filename.lastIndexOf(File.separatorChar);
+				if(i != -1)
+					songfile = filename.substring(i+1);
+				else
+					songfile = filename;
+				PlaylistItem pli = new PlaylistItem(songfile, filename, -1, false);
+				playlist.appendItem(pli);
+				load = true;
+			}
+		}
+	
+		for(int i=0; i<playlist.getPlaylistSize(); i++)
+			ListModel.addElement(playlist.getItemAt(i).name);
 		
+		return load;
+	}
+	private void loadPlaylist(){
+		String plfile = config.getPlaylistFilename();
+		System.out.println("loading PL file: "+plfile);
+		loadPL(plfile);
 	}
 	private void LoadConfig(){
 		config = Config.getInstance();
@@ -266,7 +353,7 @@ public class BHPlayerGUI extends JFrame{
 	}
 	public static void main(String args[]){
 		
-		final BHPlayerGUI BHPlayer = new BHPlayerGUI();
+		final BHPlayer BHPlayer = new BHPlayer();
 		SwingUtilities.invokeLater(new Runnable(){
 			public void run(){
 				BHPlayer.LoadParas();
@@ -301,13 +388,13 @@ public class BHPlayerGUI extends JFrame{
 				}			
 			}.start();
 			isPlaying = true;
-			new Thread("PlayerProgress"){
-				public void run(){
-					if(isPlaying){
-						Progress.setValue(bhplayerIO.getPos());
-					}
-				}
-			}.start();
+//			new Thread("PlayerProgress"){
+//				public void run(){
+//					if(isPlaying){
+//						Progress.setValue(bhplayerIO.getPos());
+//					}
+//				}
+//			}.start();
     	}catch(Exception e){
     		//e.printStackTrace();
     	}
@@ -350,12 +437,36 @@ public class BHPlayerGUI extends JFrame{
 		//2.pause
 		//3.set player status
 	}
+	
+	public void loaded(){
+		
+	}
+	public void minimize(){
+		
+	}
 	public void close(){
+		System.out.println("closing");
+		if (playlist != null)
+        {
+            boolean s = playlist.save("default.m3u");
+            config.setPlaylistFilename("default.m3u");
+            System.out.println("playlist save " +String.valueOf(s));
+        }
 		config.save();
+		System.out.println("config saved");
 		dispose();
 		System.exit(0);
 	}
-	
+	public void togglePlaylist(boolean en){
+		
+	}
+	public void toggleEqualizer(boolean en){
+		
+	}
+	public Point getLocation(){
+		Point a = new Point();
+		return a;
+	}
 //	private javax.swing.filechooser.FileFilter NewFileFilter(final String desc, final String[] allowed_extensions){
 //		return new javax.swing.filechooser.FileFilter(){
 //			//Override

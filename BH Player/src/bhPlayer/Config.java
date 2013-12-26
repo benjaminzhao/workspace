@@ -52,11 +52,11 @@ public class Config {
     private String _lastSkinDir = "";
     private String _lastEqualizer = "";
     private String _defaultSkin = "";
-    private String _playlist = "BasePlaylist";
-    private String _taginfoMpeg = "javazoom.jlgui.player.amp.tag.MpegInfo";
-    private String _taginfoOggVorbis = "javazoom.jlgui.player.amp.tag.OggVorbisInfo";
-    private String _taginfoAPE = "javazoom.jlgui.player.amp.tag.APEInfo";
-    private String _taginfoFlac = "javazoom.jlgui.player.amp.tag.FlacInfo";
+    private String _playlist = "bhPlayer.BasePlaylist";
+    private String _taginfoMpeg = "MpegInfo";
+    private String _taginfoOggVorbis = "OggVorbisInfo";
+    private String _taginfoAPE = "APEInfo";
+    private String _taginfoFlac = "FlacInfo";
     private String _playlistFilename = "default.m3u";
     private int _x = 0;
     private int _y = 0;

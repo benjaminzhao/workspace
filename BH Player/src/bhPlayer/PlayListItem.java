@@ -22,7 +22,7 @@ public class PlaylistItem {
 		this.isFile = isFile;
 		this.location = loc;
 		Config config = Config.getInstance();
-		
+		setLocation(loc);
 //		if(){
 //			getFileInfo(location, true);
 //		}
@@ -59,7 +59,10 @@ public class PlaylistItem {
 			return dispaly_name;
 	}
 	public String getFormattedDisplayName(){
-		
+		return getFormattedName();
+	}
+	public void setFormattedDisplayName(String n){
+		dispaly_name = n;
 	}
 	public String getLocation(){
 		return location;
@@ -74,7 +77,6 @@ public class PlaylistItem {
 	public void setLocation(String s){
 		setLocation(s,false);
 	}
-	
 	public long getLength(){
 		return second;
 	}
@@ -87,24 +89,13 @@ public class PlaylistItem {
 			min = min - hour * 60;
 			int sec = (int)(time - min * 60 - hour * 3600);
 			if(hour > 0){
-				length += 
+				length = Integer.toString(hour)+":";
 			}
-			length +=
+			length += Integer.toString(min)+":"+Integer.toString(sec);
 		}
 		else
 			length = "" + time;
 		return length;
-	}
-	public void getFileInfo(String l, boolean readInfo){
-		if(readInfo){
-			if(location != null && !location.equals("")){
-				//taginfo = getTagInfo(location);
-			}
-		}
-		
-	}
-	public String getM3UExtInf(){
-		
 	}
 	public int getBitrate(){
 		return -1;
@@ -115,7 +106,17 @@ public class PlaylistItem {
 	public int getChannels(){
 		return -1;
 	}
-	
+	public void getFileInfo(String l, boolean readInfo){
+		if(readInfo){
+			if(location != null && !location.equals("")){
+				//taginfo = getTagInfo(location);
+			}
+		}
+		
+	}
+	public String getM3UExtInf(){
+		return null;
+	}	
 	//	public TagInfo getTagInfo(){
 //		if(taginfo == null){
 //			getFileInfo(location, true);
