@@ -2,6 +2,7 @@ package bhPlayer;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.io.InputStream;
 import java.util.ResourceBundle;
 
 import javax.annotation.Resource;
@@ -15,41 +16,149 @@ public class Skin {
 	private boolean dspEnabled = true;
 	private String path = "";
 	
-	private String theMain = "main.bmp";
-	private String theText = "text.bmp";
-	private String theNumbers = "numbers.bmp";
-	private String theNumEx = "nums_ex.bmp";
-	private String theButtons = "cbuttons.bmp";
-	private String theEPSRButtons = "shufrep.bmp";
-	private String theVolume = "volume.bmp";
-	private String theBalance = "balance.bmp";
-	private String theTitleBar = "titlebar.bmp";
-	private String theMode = "monoster.bmp";
-	private String thePosBar = "posbar.bmp";
-	private String theIcon = "playpaus.bmp";
-	private String theViscolor = "viscolor.bmp";
-	private String viscolor = "";
-	
-	private int fontWidth = 5;
-	private int fontHeoght = 6;
-	private String fontIndex = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\"@a  " + "0123456789  :()-'!_+ /[]^&%.=$#" + "  ?*";
-	private String fakeIndex = "abcdefghijklmnopqrstuvwxyz01";
-	private String numberIndex = "0123456789 ";
-	
-	private ResourceBundle bundle = null;
+	/*  window paras  */
 	private int WinHeight;
 	private int WinWidth;
-	
-	
-	private ActiveJButton acPrevious;
-	private ActiveJButton acNext;
-	private ActiveJButton acEject;
+	private String theMain = "main.bmp";
+	private Image imMain = null;
+	/*  title member  */
+	private String theTitleBar = "titlebar.bmp";
+	private Image imTitleBar = null;
+	private Image imTitleB;
+	private ActiveJBar acTitleBar;
+	private Image[] releasedTitleImage = {imTitleB};
+	private Image[] pressedTitleImage = {imTitleB};
+	private int[] releasedTitlePanel = {27, 0, 264-20, 14};
+	private int[] pressedTitlePanel = {27, 15, 264-20, 14};
+	private int[] titleBarLocation = {0, 0};
+	/*  minimize member  */
+	private ActiveJButton acMinimize = null;
+	private Image[] releasedMinimizeImage = {};
+	private Image[] pressedMinimizeImage = {};
+	private int[] releasedMinimizePanel = {};
+	private int[] pressedMinimizePanel = {};
+	private int[] minimizeLocation = {244, 3};
+	/*  exit member  */
+	private ActiveJButton acExit = null;
+	private Image[] releasedExitImage = {};
+	private Image[] pressedExitImage = {};
+	private int[] releasedExitPanel = {};
+	private int[] pressedExitPanel = {};
+	private int[] exitLocation = {264, 3};
+	/*  mono/stereo member  */
+	private String theMode = "monoster.bmp";
+	private Image imMode = null;
+	private Image[] activeModeImage = {};
+	private Image[] passiveModeImage = {};
+	private int[] activeModePanel = {};
+	private int[] passiveModePanel = {};
+	private int[] monoLocation = {212, 41};
+	private int[] stereoLocation = {239, 41};
+	private ActiveJIcon acMonoIcon;
+	private ActiveJIcon acStereoIcon;
+	/*  posbar member  */
+	public static final int POSBARMAX = 1000;
+	private String thePosBar = "posbar.bmp";
+	private Image imPosBar = null;
+	private ActiveJSlider acPosBar;
+	private Image[] releasedPosImage = {};
+	private Image[] pressedPosImage = {};
+	private int[] releasedPosPanel = {};
+	private int[] pressedPosPanel = {};
+	private int[] posBarLocation = {16, 72};
+	/*  play/pause icon member  */
+	private String theIcon = "playpaus.bmp";
+	private Image imIcon = null;
+	private Image[] iconsImage = {};
+	private int[] iconsPanel = {};
+	private int[] iconsLocation = {};
+	private ActiveJIcon acPlayIcon;
+	private ActiveJIcon acTimeIcon;
+	/*  volume panel member  */
+	public static final int VOLUMEMAX = 100;
+	private String theVolume = "volume.bmp";
+	private Image imVolume = null;
+	private ActiveJSlider acVolume;
+	private String fakeIndex = "abcdefghijklmnopqrstuvwxyz01";
+	private Image[] volumeImage = {};
+	private Image[] releasedVolumeImage = {};
+	private Image[] pressedVolumeImage = {};
+	private int[] releasedVolumePanel0 = {};
+	private int[] pressedVolumePanel0 = {};
+	private int[] releasedVolumePanel1 = {};
+	private int[] pressedVolumePanel1 = {};
+	private int[] volumeBarLocation = {107, 57};
+	/*  balance panel member  */
+	public static final int BALANCEMAX = 5;
+	private String theBalance = "balance.bmp";
+	private Image imBalance = null;
+	private ActiveJSlider acBalance;
+	private Image[] balanceImage = {};
+	private Image[] releasedBalanceImage = {};
+	private Image[] pressedBalanceImage = {};
+	private int[] releasedBalancePanel0 = {};
+	private int[] pressedBalancePanel0 = {};
+	private int[] releasedBalancePanel1 = {};
+	private int[] pressedBalancePanel1 = {};
+	private int[] balanceBarLocation = {177, 57};
+	/*  text member  */
+	private int fontWidth = 5;
+	private int fontHeoght = 6;
+	private String theText = "text.bmp";
+	private Image imText = null;
+	private String fontIndex = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\"@a  " + "0123456789  :()-'!_+ /[]^&%.=$#" + "  ?*";
+	private ActiveFont acFont = null;
+	private ActiveJLabel acTitleLabel;
+	private int[] titleLocation = {111, 27};
+	private ActiveJLabel acSampleRateLabel;
+	private String SampleRateCleartext = "  ";
+	private int[] sampleRateLocation = {156, 43};
+	private ActiveJLabel acBitRateLabel;
+	private String bitRateClearText = "  ";
+	private int[] bitRateLocation = {110, 43};
+	/*  number member*/
+	private int numberWidth = 9;
+	private int numberHeight = 13;
+	private String theNumbers = "numbers.bmp";
+	private String theNumEx = "nums_ex.bmp";
+	private Image imNumbers = null;
+	private String numberIndex = "0123456789 ";
+	private int[] minuteHLocation = {48, 26};
+	private int[] minuteLLocation = {60, 26};
+	private int[] secondHLocation = {78, 26};
+	private int[] secondLLocation = {90, 26};
+	private ActiveJNumberLabel acMinuteH;
+	private ActiveJNumberLabel acMinuteL;
+	private ActiveJNumberLabel acSecondH;
+	private ActiveJNumberLabel acSecondL;
+	/*  button panel member  */
+	private String theButtons = "cbuttons.bmp";
+	private Image imButtons = null;
 	private ActiveJButton acPlay;
 	private ActiveJButton acPause;
 	private ActiveJButton acStop;
-	private ActiveJButton acExit;
-	private ActiveJButton acMinimize;
-	private ActiveJButton acPresents;
+	private ActiveJButton acPrevious;
+	private ActiveJButton acNext;
+	private ActiveJButton acEject;
+	private Image imPlay;
+	private Image imPause;
+	private Image imStop;
+	private Image imPrevious;
+	private Image imNext;
+	private Image imEject;
+	private Image[] releasedImage = {imPlay, imPause, imStop, imPrevious, imNext, imEject};
+	private Image[] pressedImage = {imPlay, imPause, imStop, imPrevious, imNext, imEject};
+	private int[] releasedPanel = {};
+	private int[] pressedPanel = {};
+	private int[] panelLocation = {};
+	/*  playlist member  */
+	private PlaylistUIDelegate playlist = null;
+	private String theImPLEdit = "pledit.bmp";
+	private String plEdit = "";
+	private Image imPlaylist = null;
+	private String thePLEdit = "pledite.txt";
+	private ActiveJSlider acPLSlider;
+	private int[] plSliderLocation = {255, 20};
 	private ActiveJButton acPLUp;
 	private ActiveJButton acPLDown;
 	private ActiveJButton acPLAdd;
@@ -57,44 +166,43 @@ public class Skin {
 	private ActiveJButton acPLSelect;
 	private ActiveJButton acPLMisc;
 	private ActiveJButton acPLList;
+	private int[] plAddLocation = {};
+	private int[] plRemoveLocation = {};
+	private int[] plSelectLocation = {};
+	private int[] plMiscLocation = {};
+	private int[] plListLocation = {};
+	private ActiveJPopup acPLAddPopup;
+	private ActiveJPopup acPLRemovePopup;
+	private ActiveJPopup acPLSelectPopup;
+	private ActiveJPopup acPLMiscPopup;
+	private ActiveJPopup acPLListPopup;
+	private int[] plAddPopupArea = {};
+	private int[] plRemovePopupArea = {};
+	private int[] plSelectPopupArea ={};
+	private int[] plMiscPopupArea = {};
+	private int[] plListPopupArea = {};
 	
+	
+	
+	
+	private String theEPSRButtons = "shufrep.bmp";
+	private String theEqMain = "eqmain.bmp";
+	private String theViscolor = "viscolor.txt";
+	private String theReadme = "readme.txt";
+	private String viscolor = "";
+	
+	private ResourceBundle bundle = null;
+		
+	private ActiveJButton acPresents;
 	private ActiveJToggleButton acEqualizer;
 	private ActiveJToggleButton acPlaylist;
 	private ActiveJToggleButton acRepeat;
 	private ActiveJToggleButton acShuffle;
 	private ActiveJToggleButton acOnOff;
 	private ActiveJToggleButton acAuto;
-	
-	private ActiveJBar acTitleBar;
-	
-	private ActiveJSlider acVolume;
-	private ActiveJSlider acBalance;
-	private ActiveJSlider acPosBar;
+
 	private ActiveJSlider acSlider;
-	private ActiveJSlider acPLSlider;
-	
-	private ActiveJLabel acTitleLabel;
-	private ActiveJLabel acSampleRateLabel;
-	private ActiveJLabel acBitRateLabel;
-	
-	private ActiveJNumberLabel acMinuteH;
-	private ActiveJNumberLabel acMinuteL;
-	private ActiveJNumberLabel acSecondH;
-	private ActiveJNumberLabel acSecondL;
-	
-	private ActiveJPopup acPLAddPopup;
-	private ActiveJPopup acPLRemovePopup;
-	private ActiveJPopup acPLSelectPopup;
-	private ActiveJPopup acPLMiscPopup;
-	private ActiveJPopup acPLListPopup;
-	
-	private ActiveJIcon acMonoIcon;
-	private ActiveJIcon acStereoIcon;
-	private ActiveJIcon acPlayIcon;
-	private ActiveJIcon acTimeIcon;
-	
 	private SpectrumTimeAnalyzer analyzer;
-	
 	private SplinePanel spline;
 	
 	private PlaylistUIDelegate playlist;
@@ -102,18 +210,10 @@ public class Skin {
 	private Image imFullEqualizer = null;
 	private Image imEqualizer = null;
 	private Image imSlider = null;
-	private Image imPlaylist = null;
-	private Image imIcon = null;
-	private Image imPosBar = null;
-	private Image imMode = null;
-	private Image imTitleBar = null;
-	private Image imBalance = null;
-	private Image imVolume = null;
+		
 	private Image imEPSRButton = null;
-	private Image imButton = null;
-	private Image imNumber = null;
-	private Image imText = null;
-	private Image imMain = null;
+		
+	
 	//constructor
 	public Skin(){
 		super();
@@ -147,18 +247,77 @@ public class Skin {
 	}
 	
 	public void loadSkin(String skinname){
+		SkinLoader skl = new SkinLoader(skinname);
 		try{
-			SkinLoader skl = new SkinLoader(skinname);
 			loadSkin(skl);
+			path = skinname;
 		}catch(Exception e){
-			e.printStackTrace();
+			//try to load default skin
+			InputStream is = this.getClass().getClassLoader().getResourceAsStream("metrix.wsz");
+			loadSkin(is);
 		}
 	}
 	public void loadSkin(InputStream skinstream){
-		
+		SkinLoader skl = new SkinLoader(skinstream);
+		try{
+			loadSkin(skl);
+		}catch(Exception e){
+			//try to load default skin
+			InputStream is = this.getClass().getClassLoader().getResourceAsStream("metrix.wsz");
+			loadSkin(is);
+		}
 	}
-	public void loadSkin(SkinLoader skinloader) throws Exception{
+	public void loadSkin(SkinLoader skl) throws Exception{
+		skl.loadImage();
 		
+		imMain = skl.getImage(theMain);
+		imButtons = skl.getImage(theButtons);
+		imTitleBar = skl.getImage(theTitleBar);
+		imText = skl.getImage(theText);
+		imMode = skl.getImage(theMode);
+		imIcon = skl.getImage(theIcon);
+		imEPSRButton = skl.getImage(theEPSRButtons);
+		
+		imNumbers = skl.getImage(theNumbers);
+		if(imNumbers == null)
+			imNumbers = skl.getImage(theNumEx);
+		viscolor = (String) skl.getContent(theViscolor);
+		
+		imVolume = skl.getImage(theVolume);
+		int vh = imVolume.getHeight(null)-422;
+		if(vh > 0){
+			releasedVolumePanel0[3] = vh;
+			pressedVolumePanel0[3] = vh;
+			releasedVolumePanel1[3] = vh;
+			pressedVolumePanel1[3] = vh;
+		}
+		
+		imBalance = skl.getImage(theBalance);
+		if(imBalance == null)
+			imBalance = imVolume;
+		int bh = imBalance.getHeight(null)-422;
+		if(bh > 0){
+			releasedBalancePanel0[3] = bh;
+			pressedBalancePanel0[3] = bh;
+			releasedBalancePanel1[3] = bh;
+			pressedBalancePanel1[3] = bh;
+		}
+		
+		imPosBar = skl.getImage(thePosBar);
+		int ph = imPosBar.getHeight(null);
+		if(ph > 0){
+			releasedPosPanel[3] = ph;
+			pressedPosPanel[3] = ph;
+		}
+		
+		WinHeight = imMain.getHeight(null);
+		WinWidth = imMain.getWidth(null);
+		/*  title bar  */
+		readPanel();
+		/*  playlist  */
+		imPlaylist = skl.getImage(theImPLEdit);
+		plEdit = (String) skl.getContent(thePLEdit);
+		setPlaylistPanel();
 	}
 	
 	public void setOnOffAutoPanel(){

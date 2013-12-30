@@ -1,6 +1,7 @@
 package bhPlayer;
 
 import java.awt.Image;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -16,9 +17,13 @@ public class SkinLoader {
 	public SkinLoader(String filename){
 		imagetable = new Hashtable();
 		try{
-			
+			zis = new ZipInputStream(new FileInputStream(filename));	
 		}catch(Exception e){
-			e.printStackTrace();
+			//try to load default skin
+			ClassLoader cl = this.getClass().getClassLoader();
+			InputStream is = cl.getResourceAsStream("metrix.wsz");
+			if(is != null)
+				zis = new ZipInputStream(is);
 		}
 	}
 	public SkinLoader(InputStream inputstream){
